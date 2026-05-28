@@ -1,108 +1,271 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Expense & Budget Visualizer</title>
+    <title>Visualisasi Pengeluaran & Anggaran</title>
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   </head>
   <body>
-    <div class="app-wrapper">
 
-      <!-- Header -->
+    <!-- ══════════════════════════════════════════════════════
+         AUTH SCREEN  (ditampilkan sebelum login)
+    ══════════════════════════════════════════════════════════ -->
+    <div class="auth-screen" id="authScreen">
+      <div class="auth-card">
+
+        <!-- Logo -->
+        <div class="auth-logo">
+          <span class="auth-logo-icon">💰</span>
+          <h1 class="auth-logo-text">Visualisasi Anggaran</h1>
+        </div>
+
+        <!-- Tab: Masuk / Daftar -->
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab active" id="tabLogin" role="tab" aria-selected="true" aria-controls="panelLogin">
+            Masuk
+          </button>
+          <button class="auth-tab" id="tabRegister" role="tab" aria-selected="false" aria-controls="panelRegister">
+            Daftar
+          </button>
+        </div>
+
+        <!-- Panel: Masuk -->
+        <div class="auth-panel" id="panelLogin" role="tabpanel">
+          <form id="loginForm" novalidate>
+            <div class="form-group">
+              <label for="loginUsername">Nama Pengguna</label>
+              <input type="text" id="loginUsername" placeholder="Masukkan nama pengguna" autocomplete="username" />
+              <span class="field-error" id="loginUsernameError"></span>
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Kata Sandi</label>
+              <div class="password-row">
+                <input type="password" id="loginPassword" placeholder="Masukkan kata sandi" autocomplete="current-password" />
+                <button type="button" class="btn-eye" id="toggleLoginPwd" aria-label="Tampilkan kata sandi">👁</button>
+              </div>
+              <span class="field-error" id="loginPasswordError"></span>
+            </div>
+            <div class="field-error auth-global-error" id="loginGlobalError"></div>
+            <button type="submit" class="btn-add">Masuk</button>
+          </form>
+        </div>
+
+        <!-- Panel: Daftar -->
+        <div class="auth-panel hidden" id="panelRegister" role="tabpanel">
+          <form id="registerForm" novalidate>
+            <div class="form-group">
+              <label for="regUsername">Nama Pengguna</label>
+              <input type="text" id="regUsername" placeholder="Buat nama pengguna" autocomplete="username" maxlength="32" />
+              <span class="field-error" id="regUsernameError"></span>
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Kata Sandi</label>
+              <div class="password-row">
+                <input type="password" id="regPassword" placeholder="Minimal 6 karakter" autocomplete="new-password" />
+                <button type="button" class="btn-eye" id="toggleRegPwd" aria-label="Tampilkan kata sandi">👁</button>
+              </div>
+              <span class="field-error" id="regPasswordError"></span>
+            </div>
+            <div class="form-group">
+              <label for="regPasswordConfirm">Konfirmasi Kata Sandi</label>
+              <div class="password-row">
+                <input type="password" id="regPasswordConfirm" placeholder="Ulangi kata sandi" autocomplete="new-password" />
+                <button type="button" class="btn-eye" id="toggleRegPwdConfirm" aria-label="Tampilkan kata sandi">👁</button>
+              </div>
+              <span class="field-error" id="regPasswordConfirmError"></span>
+            </div>
+            <div class="field-error auth-global-error" id="regGlobalError"></div>
+            <button type="submit" class="btn-add">Buat Akun</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         APP  (tersembunyi sampai login berhasil)
+    ══════════════════════════════════════════════════════════ -->
+    <div class="app-wrapper hidden" id="appWrapper">
+
+      <!-- ── Header ── -->
       <header class="app-header">
         <div class="header-inner">
           <div class="logo">
             <span class="logo-icon">💰</span>
-            <span class="logo-text">Budget Visualizer</span>
+            <span class="logo-text">Visualisasi Anggaran</span>
           </div>
-          <div class="balance-card">
-            <span class="balance-label">Total Balance</span>
-            <span class="balance-amount" id="totalBalance">$0.00</span>
+
+          <div class="header-controls">
+            <!-- Info pengguna + tombol keluar -->
+            <div class="user-info">
+              <span class="user-avatar" id="userAvatar">?</span>
+              <span class="user-name" id="userNameDisplay"></span>
+            </div>
+            <button class="btn-logout" id="btnLogout" title="Keluar" aria-label="Keluar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
+
+            <!-- Tombol tema gelap / terang -->
+            <button class="btn-theme" id="themeToggle" aria-label="Ganti mode gelap" title="Ganti mode gelap / terang">
+              <span class="theme-icon" id="themeIcon">🌙</span>
+            </button>
+
+            <!-- Saldo -->
+            <div class="balance-card">
+              <span class="balance-label">Total Pengeluaran</span>
+              <span class="balance-amount" id="totalBalance">Rp 0</span>
+            </div>
           </div>
         </div>
       </header>
 
-      <!-- Main Content -->
+      <!-- ── Konten Utama ── -->
       <main class="main-content">
 
-        <!-- Left Column: Form + Chart -->
+        <!-- Kolom kiri -->
         <section class="left-column">
 
-          <!-- Add Transaction Form -->
+          <!-- Tambah Transaksi -->
           <div class="card">
-            <h2 class="card-title">Add Transaction</h2>
+            <h2 class="card-title">Tambah Transaksi</h2>
             <form id="transactionForm" novalidate>
+
               <div class="form-group">
-                <label for="itemName">Item Name</label>
-                <input
-                  type="text"
-                  id="itemName"
-                  placeholder="e.g. Lunch, Bus ticket…"
-                  autocomplete="off"
-                />
+                <label for="itemName">Nama Item</label>
+                <input type="text" id="itemName" placeholder="cth. Makan siang, Tiket bus…" autocomplete="off" />
                 <span class="field-error" id="nameError"></span>
               </div>
 
               <div class="form-group">
-                <label for="amount">Amount ($)</label>
-                <input
-                  type="number"
-                  id="amount"
-                  placeholder="0.00"
-                  min="0.01"
-                  step="0.01"
-                />
+                <label for="amount">Jumlah (Rp)</label>
+                <input type="number" id="amount" placeholder="0" min="1" step="1" />
                 <span class="field-error" id="amountError"></span>
               </div>
 
               <div class="form-group">
-                <label for="category">Category</label>
-                <select id="category">
-                  <option value="">— Select category —</option>
-                  <option value="Food">🍔 Food</option>
-                  <option value="Transport">🚌 Transport</option>
-                  <option value="Fun">🎉 Fun</option>
-                </select>
+                <label for="category">Kategori</label>
+                <div class="category-row">
+                  <select id="category">
+                    <option value="">— Pilih kategori —</option>
+                    <option value="Makanan">🍔 Makanan</option>
+                    <option value="Transportasi">🚌 Transportasi</option>
+                    <option value="Hiburan">🎉 Hiburan</option>
+                  </select>
+                  <button type="button" class="btn-icon" id="openAddCategory" title="Tambah kategori kustom" aria-label="Tambah kategori kustom">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
                 <span class="field-error" id="categoryError"></span>
               </div>
 
-              <button type="submit" class="btn-add">Add Transaction</button>
+              <!-- Batas pengeluaran -->
+              <div class="form-group">
+                <label for="spendLimit">Batas Pengeluaran (Rp) <span class="label-hint">— sorot jika melebihi ini</span></label>
+                <input type="number" id="spendLimit" placeholder="cth. 100000" min="0" step="1" />
+              </div>
+
+              <button type="submit" class="btn-add">Tambah Transaksi</button>
             </form>
           </div>
 
-          <!-- Pie Chart -->
+          <!-- Grafik -->
           <div class="card chart-card">
-            <h2 class="card-title">Spending by Category</h2>
+            <h2 class="card-title">Pengeluaran per Kategori</h2>
             <div class="chart-container">
               <canvas id="spendingChart"></canvas>
-              <p class="chart-empty" id="chartEmpty">No data yet. Add a transaction to see the chart.</p>
+              <p class="chart-empty" id="chartEmpty">Belum ada data. Tambahkan transaksi untuk melihat grafik.</p>
             </div>
             <div class="chart-legend" id="chartLegend"></div>
           </div>
 
         </section>
 
-        <!-- Right Column: Transaction List -->
+        <!-- Kolom kanan -->
         <section class="right-column">
+
+          <!-- Ringkasan Bulanan -->
+          <div class="card summary-card" id="summaryCard">
+            <div class="summary-header">
+              <h2 class="card-title">Ringkasan Bulanan</h2>
+              <div class="month-nav">
+                <button class="btn-icon" id="prevMonth" aria-label="Bulan sebelumnya">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <span class="month-label" id="monthLabel"></span>
+                <button class="btn-icon" id="nextMonth" aria-label="Bulan berikutnya">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="summary-grid" id="summaryGrid">
+              <div class="summary-empty">Tidak ada transaksi bulan ini.</div>
+            </div>
+          </div>
+
+          <!-- Daftar Transaksi -->
           <div class="card list-card">
             <div class="list-header">
-              <h2 class="card-title">Transactions</h2>
-              <span class="transaction-count" id="transactionCount">0 items</span>
+              <h2 class="card-title">Transaksi</h2>
+              <div class="list-controls">
+                <select class="sort-select" id="sortSelect" aria-label="Urutkan transaksi">
+                  <option value="date-desc">Terbaru</option>
+                  <option value="date-asc">Terlama</option>
+                  <option value="amount-desc">Jumlah ↓</option>
+                  <option value="amount-asc">Jumlah ↑</option>
+                  <option value="category-asc">Kategori A–Z</option>
+                </select>
+                <span class="transaction-count" id="transactionCount">0 item</span>
+              </div>
             </div>
 
             <div class="list-scroll" id="transactionList">
               <div class="empty-state" id="emptyState">
                 <span class="empty-icon">📋</span>
-                <p>No transactions yet.</p>
-                <p class="empty-sub">Add one using the form on the left.</p>
+                <p>Belum ada transaksi.</p>
+                <p class="empty-sub">Tambahkan melalui formulir di sebelah kiri.</p>
               </div>
             </div>
           </div>
-        </section>
 
+        </section>
       </main>
+    </div>
+
+    <!-- ── Modal Tambah Kategori Kustom ── -->
+    <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+          <h3 id="modalTitle">Tambah Kategori Kustom</h3>
+          <button class="btn-icon" id="closeModal" aria-label="Tutup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="customCatName">Nama Kategori</label>
+            <input type="text" id="customCatName" placeholder="cth. Kesehatan, Belanja…" maxlength="24" autocomplete="off" />
+            <span class="field-error" id="customCatError"></span>
+          </div>
+          <div class="form-group">
+            <label for="customCatEmoji">Emoji</label>
+            <input type="text" id="customCatEmoji" placeholder="cth. 🏥" maxlength="4" autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label for="customCatColor">Warna</label>
+            <input type="color" id="customCatColor" value="#10b981" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancelModal">Batal</button>
+          <button class="btn-add" id="saveCategory" style="width:auto;padding:10px 24px;">Simpan Kategori</button>
+        </div>
+      </div>
     </div>
 
     <script src="js/app.js"></script>
