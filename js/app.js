@@ -542,35 +542,58 @@ function renderList() {
   if (count === 0) { empty.style.display='flex'; return; }
   empty.style.display = 'none';
 
+  // Kelompokkan per tanggal
+  const groups = {};
   sorted.forEach(t => {
-    const meta      = getMeta(t.category);
-    const overLimit = spendLimit > 0 && t.amount > spendLimit;
-    const item      = document.createElement('div');
-    item.className  = 'transaction-item' + (overLimit ? ' over-limit' : '');
-    item.dataset.id = t.id;
+    const dateKey = new Date(t.date).toLocaleDateString('id-ID', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+    if (!groups[dateKey]) groups[dateKey] = { transactions: [], total: 0, rawDate: t.date };
+    groups[dateKey].transactions.push(t);
+    groups[dateKey].total += t.amount;
+  });
 
-    const iconStyle = meta.cssClass==='custom' ? `style="background:${hexToRgba(meta.color,0.12)}"` : '';
-    const catStyle  = meta.cssClass==='custom' ? `style="color:${meta.color}"` : '';
+  Object.entries(groups).forEach(([dateLabel, group]) => {
+    // Header tanggal
+    const header = document.createElement('div');
+    header.className = 'date-group-header';
+    header.innerHTML = `
+      <span class="date-group-label">${dateLabel}</span>
+      <span class="date-group-total">${formatCurrency(group.total)}</span>
+    `;
+    list.appendChild(header);
 
-    item.innerHTML = `
-      <div class="item-icon ${meta.cssClass}" ${iconStyle} aria-hidden="true">${meta.emoji}</div>
-      <div class="item-details">
-        <div class="item-name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>
-        <div class="item-category ${meta.cssClass}" ${catStyle}>${escapeHtml(t.category)}</div>
-      </div>
-      ${overLimit ? '<span class="over-limit-badge">⚠ Melebihi batas</span>' : ''}
-      <div class="item-amount">${formatCurrency(t.amount)}</div>
-      <button class="btn-delete" aria-label="Hapus ${escapeHtml(t.name)}">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"/>
-          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-          <path d="M10 11v6M14 11v6"/>
-          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-        </svg>
-      </button>`;
-    item.querySelector('.btn-delete').addEventListener('click', () => deleteTransaction(t.id));
-    list.appendChild(item);
+    // Transaksi dalam grup ini
+    group.transactions.forEach(t => {
+      const meta      = getMeta(t.category);
+      const overLimit = spendLimit > 0 && t.amount > spendLimit;
+      const item      = document.createElement('div');
+      item.className  = 'transaction-item' + (overLimit ? ' over-limit' : '');
+      item.dataset.id = t.id;
+
+      const iconStyle = meta.cssClass==='custom' ? `style="background:${hexToRgba(meta.color,0.12)}"` : '';
+      const catStyle  = meta.cssClass==='custom' ? `style="color:${meta.color}"` : '';
+
+      item.innerHTML = `
+        <div class="item-icon ${meta.cssClass}" ${iconStyle} aria-hidden="true">${meta.emoji}</div>
+        <div class="item-details">
+          <div class="item-name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>
+          <div class="item-category ${meta.cssClass}" ${catStyle}>${escapeHtml(t.category)}</div>
+        </div>
+        ${overLimit ? '<span class="over-limit-badge">⚠ Melebihi batas</span>' : ''}
+        <div class="item-amount">${formatCurrency(t.amount)}</div>
+        <button class="btn-delete" aria-label="Hapus ${escapeHtml(t.name)}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+        </button>`;
+      item.querySelector('.btn-delete').addEventListener('click', () => deleteTransaction(t.id));
+      list.appendChild(item);
+    });
   });
 }
 

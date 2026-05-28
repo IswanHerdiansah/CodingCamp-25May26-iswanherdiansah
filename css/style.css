@@ -785,6 +785,33 @@ body {
 .list-scroll::-webkit-scrollbar-track { background: transparent; }
 .list-scroll::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 10px; }
 
+/* Date group header */
+.date-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 4px;
+  margin-top: 6px;
+}
+
+.date-group-header:first-child { margin-top: 0; }
+
+.date-group-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: capitalize;
+}
+
+.date-group-total {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: rgba(79,110,247,.08);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
 /* Empty state */
 .empty-state {
   display: flex;
