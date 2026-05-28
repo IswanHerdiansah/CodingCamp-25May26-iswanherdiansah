@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense & Budget Visualizer</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="app-wrapper">
+
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-inner">
+          <div class="logo">
+            <span class="logo-icon">💰</span>
+            <span class="logo-text">Budget Visualizer</span>
+          </div>
+          <div class="balance-card">
+            <span class="balance-label">Total Balance</span>
+            <span class="balance-amount" id="totalBalance">$0.00</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+
+        <!-- Left Column: Form + Chart -->
+        <section class="left-column">
+
+          <!-- Add Transaction Form -->
+          <div class="card">
+            <h2 class="card-title">Add Transaction</h2>
+            <form id="transactionForm" novalidate>
+              <div class="form-group">
+                <label for="itemName">Item Name</label>
+                <input
+                  type="text"
+                  id="itemName"
+                  placeholder="e.g. Lunch, Bus ticket…"
+                  autocomplete="off"
+                />
+                <span class="field-error" id="nameError"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="amount">Amount ($)</label>
+                <input
+                  type="number"
+                  id="amount"
+                  placeholder="0.00"
+                  min="0.01"
+                  step="0.01"
+                />
+                <span class="field-error" id="amountError"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category">
+                  <option value="">— Select category —</option>
+                  <option value="Food">🍔 Food</option>
+                  <option value="Transport">🚌 Transport</option>
+                  <option value="Fun">🎉 Fun</option>
+                </select>
+                <span class="field-error" id="categoryError"></span>
+              </div>
+
+              <button type="submit" class="btn-add">Add Transaction</button>
+            </form>
+          </div>
+
+          <!-- Pie Chart -->
+          <div class="card chart-card">
+            <h2 class="card-title">Spending by Category</h2>
+            <div class="chart-container">
+              <canvas id="spendingChart"></canvas>
+              <p class="chart-empty" id="chartEmpty">No data yet. Add a transaction to see the chart.</p>
+            </div>
+            <div class="chart-legend" id="chartLegend"></div>
+          </div>
+
+        </section>
+
+        <!-- Right Column: Transaction List -->
+        <section class="right-column">
+          <div class="card list-card">
+            <div class="list-header">
+              <h2 class="card-title">Transactions</h2>
+              <span class="transaction-count" id="transactionCount">0 items</span>
+            </div>
+
+            <div class="list-scroll" id="transactionList">
+              <div class="empty-state" id="emptyState">
+                <span class="empty-icon">📋</span>
+                <p>No transactions yet.</p>
+                <p class="empty-sub">Add one using the form on the left.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
