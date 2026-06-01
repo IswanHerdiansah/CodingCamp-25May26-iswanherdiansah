@@ -3,278 +3,489 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visualisasi Anggaran</title>
+  <title>Dompet — Visualisasi Anggaran</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-  <!-- Toast container -->
-  <div id="toastContainer"></div>
+<div id="toastContainer"></div>
 
-  <!-- ════════════════════════════════════════════════
-       AUTH SCREEN
-  ════════════════════════════════════════════════ -->
-  <div class="auth-screen" id="authScreen">
-    <div class="auth-card">
-      <div class="auth-logo">
-        <div class="auth-logo-icon">💰</div>
-        <h1 class="auth-logo-text">Dompet</h1>
-        <p class="auth-logo-sub">Visualisasi Anggaran Pribadi</p>
-      </div>
-
-      <div class="auth-loading hidden" id="authLoading">
-        <div class="spinner"></div>
-        <span id="authLoadingText">Memuat…</span>
-      </div>
-
-      <div class="auth-tabs" role="tablist">
-        <button class="auth-tab active" id="tabLogin" role="tab" aria-selected="true">Masuk</button>
-        <button class="auth-tab" id="tabRegister" role="tab" aria-selected="false">Daftar</button>
-      </div>
-
-      <!-- Panel Masuk -->
-      <div class="auth-panel" id="panelLogin" role="tabpanel">
-        <form id="loginForm" novalidate>
-          <div class="form-group">
-            <label for="loginEmail">Email</label>
-            <input type="email" id="loginEmail" placeholder="contoh@email.com" autocomplete="email" />
-            <span class="field-error" id="loginEmailError"></span>
-          </div>
-          <div class="form-group">
-            <label for="loginPassword">Kata Sandi</label>
-            <div class="password-row">
-              <input type="password" id="loginPassword" placeholder="Masukkan kata sandi" autocomplete="current-password" />
-              <button type="button" class="btn-eye" id="toggleLoginPwd" aria-label="Tampilkan kata sandi">👁</button>
-            </div>
-            <span class="field-error" id="loginPasswordError"></span>
-          </div>
-          <div class="field-error auth-global-error" id="loginGlobalError"></div>
-          <button type="submit" class="btn-add" id="btnLogin">Masuk →</button>
-        </form>
-      </div>
-
-      <!-- Panel Daftar -->
-      <div class="auth-panel hidden" id="panelRegister" role="tabpanel">
-        <form id="registerForm" novalidate>
-          <div class="form-group">
-            <label for="regDisplayName">Nama Tampilan</label>
-            <input type="text" id="regDisplayName" placeholder="Nama yang ditampilkan di app" maxlength="32" autocomplete="off" />
-            <span class="field-error" id="regDisplayNameError"></span>
-          </div>
-          <div class="form-group">
-            <label for="regEmail">Email</label>
-            <input type="email" id="regEmail" placeholder="contoh@email.com" autocomplete="email" />
-            <span class="field-error" id="regEmailError"></span>
-          </div>
-          <div class="form-group">
-            <label for="regPassword">Kata Sandi</label>
-            <div class="password-row">
-              <input type="password" id="regPassword" placeholder="Minimal 6 karakter" autocomplete="new-password" />
-              <button type="button" class="btn-eye" id="toggleRegPwd" aria-label="Tampilkan kata sandi">👁</button>
-            </div>
-            <span class="field-error" id="regPasswordError"></span>
-          </div>
-          <div class="form-group">
-            <label for="regPasswordConfirm">Konfirmasi Kata Sandi</label>
-            <div class="password-row">
-              <input type="password" id="regPasswordConfirm" placeholder="Ulangi kata sandi" autocomplete="new-password" />
-              <button type="button" class="btn-eye" id="toggleRegPwdConfirm" aria-label="Tampilkan kata sandi">👁</button>
-            </div>
-            <span class="field-error" id="regPasswordConfirmError"></span>
-          </div>
-          <div class="field-error auth-global-error" id="regGlobalError"></div>
-          <button type="submit" class="btn-add" id="btnRegister">Buat Akun →</button>
-        </form>
-      </div>
+<!-- ════════════════════════════════════════════
+     AUTH SCREEN
+════════════════════════════════════════════ -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">💰</div>
+      <h1 class="auth-logo-text">Dompet</h1>
+      <p class="auth-logo-sub">Visualisasi Anggaran Pribadi</p>
     </div>
-  </div>
-
-  <!-- ════════════════════════════════════════════════
-       APP
-  ════════════════════════════════════════════════ -->
-  <div class="app-wrapper hidden" id="appWrapper">
-
-    <div class="app-loading hidden" id="appLoading">
+    <div class="auth-loading hidden" id="authLoading">
       <div class="spinner"></div>
-      <span>Memuat data…</span>
+      <span id="authLoadingText">Memuat…</span>
     </div>
-
-    <!-- Header -->
-    <header class="app-header">
-      <div class="header-inner">
-        <div class="logo">
-          <span class="logo-icon">💰</span>
-          <span class="logo-text">Visualisasi Anggaran</span>
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" id="tabLogin">Masuk</button>
+      <button class="auth-tab" id="tabRegister">Daftar</button>
+    </div>
+    <!-- Panel Masuk -->
+    <div class="auth-panel" id="panelLogin">
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="contoh@email.com" autocomplete="email" />
+          <span class="field-error" id="loginEmailError"></span>
         </div>
-        <div class="header-controls">
-          <div class="user-info">
-            <span class="user-avatar" id="userAvatar">?</span>
-            <span class="user-name" id="userNameDisplay"></span>
+        <div class="form-group">
+          <label>Kata Sandi</label>
+          <div class="password-row">
+            <input type="password" id="loginPassword" placeholder="Masukkan kata sandi" autocomplete="current-password" />
+            <button type="button" class="btn-eye" id="toggleLoginPwd">👁</button>
           </div>
-          <button class="btn-logout" id="btnLogout" title="Keluar" aria-label="Keluar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-          </button>
-          <button class="btn-theme" id="themeToggle" aria-label="Ganti mode" title="Mode gelap / terang">
-            <span class="theme-icon" id="themeIcon">🌙</span>
-          </button>
-          <div class="balance-card">
-            <span class="balance-label">Total Pengeluaran</span>
-            <span class="balance-amount" id="totalBalance">Rp 0</span>
-          </div>
+          <span class="field-error" id="loginPasswordError"></span>
         </div>
-      </div>
-    </header>
-
-    <!-- Konten Utama -->
-    <main class="main-content">
-
-      <!-- Kolom kiri -->
-      <section class="left-column">
-        <div class="card">
-          <h2 class="card-title"><span class="card-title-icon">✏️</span>Tambah Transaksi</h2>
-          <form id="transactionForm" novalidate>
-            <div class="form-group">
-              <label for="itemName">Nama Item</label>
-              <input type="text" id="itemName" placeholder="cth. Makan siang, Tiket bus…" autocomplete="off" />
-              <span class="field-error" id="nameError"></span>
-            </div>
-            <div class="form-group">
-              <label for="amount">Jumlah (Rp)</label>
-              <input type="number" id="amount" placeholder="0" min="1" step="1" />
-              <span class="field-error" id="amountError"></span>
-            </div>
-            <div class="form-group">
-              <label for="category">Kategori</label>
-              <div class="category-row">
-                <select id="category">
-                  <option value="">— Pilih kategori —</option>
-                  <option value="Makanan">🍔 Makanan</option>
-                  <option value="Transportasi">🚌 Transportasi</option>
-                  <option value="Hiburan">🎉 Hiburan</option>
-                </select>
-                <button type="button" class="btn-icon" id="openAddCategory" title="Tambah kategori kustom" aria-label="Tambah kategori kustom">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                </button>
-              </div>
-              <span class="field-error" id="categoryError"></span>
-            </div>
-            <div class="form-group">
-              <label for="spendLimit">Batas Pengeluaran (Rp) <span class="label-hint">— sorot jika melebihi</span></label>
-              <input type="number" id="spendLimit" placeholder="cth. 100000" min="0" step="1" />
-              <div class="spend-limit-bar-wrap" id="spendLimitBarWrap">
-                <div class="spend-limit-label">
-                  <span id="spendLimitUsed">Rp 0</span>
-                  <span id="spendLimitMax">Rp 0</span>
-                </div>
-                <div class="spend-limit-track">
-                  <div class="spend-limit-fill" id="spendLimitFill" style="width:0%"></div>
-                </div>
-              </div>
-            </div>
-            <button type="submit" class="btn-add" id="btnAddTx">Tambah Transaksi</button>
-          </form>
+        <div class="field-error auth-global-error" id="loginGlobalError"></div>
+        <button type="submit" class="btn-add" id="btnLogin">Masuk →</button>
+      </form>
+    </div>
+    <!-- Panel Daftar -->
+    <div class="auth-panel hidden" id="panelRegister">
+      <form id="registerForm" novalidate>
+        <div class="form-group">
+          <label>Nama Tampilan</label>
+          <input type="text" id="regDisplayName" placeholder="Nama yang ditampilkan" maxlength="32" autocomplete="off" />
+          <span class="field-error" id="regDisplayNameError"></span>
         </div>
-
-        <div class="card chart-card">
-          <h2 class="card-title"><span class="card-title-icon">📊</span>Pengeluaran per Kategori</h2>
-          <div class="chart-container">
-            <canvas id="spendingChart"></canvas>
-            <p class="chart-empty" id="chartEmpty">Belum ada data.<br>Tambahkan transaksi untuk melihat grafik.</p>
-          </div>
-          <div class="chart-legend" id="chartLegend"></div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="regEmail" placeholder="contoh@email.com" autocomplete="email" />
+          <span class="field-error" id="regEmailError"></span>
         </div>
-      </section>
-
-      <!-- Kolom kanan -->
-      <section class="right-column">
-        <div class="card summary-card" id="summaryCard">
-          <div class="summary-header">
-            <h2 class="card-title"><span class="card-title-icon">📅</span>Ringkasan Bulanan</h2>
-            <div class="month-nav">
-              <button class="btn-icon" id="prevMonth" aria-label="Bulan sebelumnya">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-              </button>
-              <span class="month-label" id="monthLabel"></span>
-              <button class="btn-icon" id="nextMonth" aria-label="Bulan berikutnya">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
+        <div class="form-group">
+          <label>Kata Sandi</label>
+          <div class="password-row">
+            <input type="password" id="regPassword" placeholder="Minimal 6 karakter" autocomplete="new-password" />
+            <button type="button" class="btn-eye" id="toggleRegPwd">👁</button>
           </div>
-          <div class="summary-grid" id="summaryGrid">
-            <div class="summary-empty">Tidak ada transaksi bulan ini.</div>
-          </div>
+          <span class="field-error" id="regPasswordError"></span>
         </div>
-
-        <div class="card list-card">
-          <div class="list-header">
-            <h2 class="card-title"><span class="card-title-icon">📋</span>Transaksi</h2>
-            <div class="list-controls">
-              <select class="sort-select" id="sortSelect" aria-label="Urutkan transaksi">
-                <option value="date-desc">Terbaru</option>
-                <option value="date-asc">Terlama</option>
-                <option value="amount-desc">Jumlah ↓</option>
-                <option value="amount-asc">Jumlah ↑</option>
-                <option value="category-asc">Kategori A–Z</option>
-              </select>
-              <span class="transaction-count" id="transactionCount">0 item</span>
-            </div>
+        <div class="form-group">
+          <label>Konfirmasi Kata Sandi</label>
+          <div class="password-row">
+            <input type="password" id="regPasswordConfirm" placeholder="Ulangi kata sandi" autocomplete="new-password" />
+            <button type="button" class="btn-eye" id="toggleRegPwdConfirm">👁</button>
           </div>
-          <div class="list-scroll" id="transactionList">
-            <div class="empty-state" id="emptyState">
-              <span class="empty-icon">📋</span>
-              <p>Belum ada transaksi.</p>
-              <p class="empty-sub">Tambahkan melalui formulir di sebelah kiri.</p>
-            </div>
-          </div>
+          <span class="field-error" id="regPasswordConfirmError"></span>
         </div>
-      </section>
-    </main>
+        <div class="field-error auth-global-error" id="regGlobalError"></div>
+        <button type="submit" class="btn-add" id="btnRegister">Buat Akun →</button>
+      </form>
+    </div>
+  </div>
+</div>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-      Dibuat oleh <strong>Iswan Herdiansah</strong> &nbsp;·&nbsp; Visualisasi Anggaran © 2026
-    </footer>
+<!-- ════════════════════════════════════════════
+     APP SHELL
+════════════════════════════════════════════ -->
+<div class="app-shell hidden" id="appShell">
+
+  <!-- App Loading -->
+  <div class="app-loading hidden" id="appLoading">
+    <div class="spinner"></div><span>Memuat data…</span>
   </div>
 
-  <!-- Modal Kategori Kustom -->
-  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modal-header">
-        <h3 id="modalTitle">Tambah Kategori Kustom</h3>
-        <button class="btn-icon" id="closeModal" aria-label="Tutup" style="width:32px;height:32px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">
+        <span class="logo-icon">💰</span>
+        <span class="logo-text">Visualisasi Anggaran</span>
+      </div>
+      <div class="topbar-right">
+        <div class="user-chip">
+          <span class="user-avatar" id="userAvatar">?</span>
+          <span class="user-name" id="userNameDisplay"></span>
+        </div>
+        <button class="icon-btn" id="themeToggle" title="Ganti tema"><span id="themeIcon">🌙</span></button>
+        <button class="icon-btn danger" id="btnLogout" title="Keluar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="customCatName">Nama Kategori</label>
-          <input type="text" id="customCatName" placeholder="cth. Kesehatan, Belanja…" maxlength="24" autocomplete="off" />
-          <span class="field-error" id="customCatError"></span>
+    </div>
+  </header>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-item active" data-page="transaksi">
+      <span class="nav-icon">💳</span><span class="nav-label" data-i18n="nav_transaksi">Transaksi</span>
+    </button>
+    <button class="nav-item" data-page="rekening">
+      <span class="nav-icon">🏦</span><span class="nav-label" data-i18n="nav_rekening">Rekening</span>
+    </button>
+    <button class="nav-item nav-add" id="btnOpenAdd">
+      <span class="nav-icon-add">+</span>
+    </button>
+    <button class="nav-item" data-page="rekap">
+      <span class="nav-icon">📊</span><span class="nav-label" data-i18n="nav_rekap">Rekap</span>
+    </button>
+    <button class="nav-item" data-page="setting">
+      <span class="nav-icon">⚙️</span><span class="nav-label" data-i18n="nav_setting">Setting</span>
+    </button>
+  </nav>
+
+  <!-- Page Container -->
+  <main class="page-container" id="pageContainer">
+
+    <!-- ══ PAGE: TRANSAKSI ══ -->
+    <div class="page active" id="page-transaksi">
+      <!-- Summary bar -->
+      <div class="summary-bar">
+        <div class="summary-item-bar income">
+          <span class="sib-label" data-i18n="pemasukan">Pemasukan</span>
+          <span class="sib-value" id="totalIncome">Rp 0</span>
         </div>
-        <div class="form-group">
-          <label for="customCatEmoji">Emoji</label>
-          <input type="text" id="customCatEmoji" placeholder="cth. 🏥" maxlength="4" autocomplete="off" />
+        <div class="summary-item-bar expense">
+          <span class="sib-label" data-i18n="pengeluaran">Pengeluaran</span>
+          <span class="sib-value" id="totalExpense">Rp 0</span>
         </div>
-        <div class="form-group">
-          <label for="customCatColor">Warna</label>
-          <input type="color" id="customCatColor" value="#10b981" />
+        <div class="summary-item-bar balance">
+          <span class="sib-label" data-i18n="selisih">Selisih</span>
+          <span class="sib-value" id="totalDiff">Rp 0</span>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" id="cancelModal">Batal</button>
-        <button class="btn-add" id="saveCategory" style="width:auto;padding:10px 24px;">Simpan</button>
+
+      <!-- Export bar -->
+      <div class="export-bar">
+        <div class="search-wrap" style="flex:1">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="Cari transaksi…" />
+        </div>
+        <div class="export-btn-wrap">
+          <button class="btn-export-main" id="btnExportToggle">📤 Export ▾</button>
+          <div class="export-dropdown" id="exportDropdown">
+            <div class="export-dropdown-title">Rentang Tanggal</div>
+            <div class="export-date-row">
+              <input type="date" id="exportFrom" class="date-input" />
+              <span class="date-sep">—</span>
+              <input type="date" id="exportTo" class="date-input" />
+            </div>
+            <div class="export-actions">
+              <button class="btn-export" id="btnExportExcel">📥 Excel</button>
+              <button class="btn-export" id="btnExportPdf">📄 PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Riwayat -->
+      <div class="section-card">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="riwayat">Riwayat</h2>
+        </div>
+        <div class="tx-list" id="txList">
+          <div class="empty-state" id="txEmpty">
+            <span class="empty-icon">📋</span>
+            <p data-i18n="tidak_ada_data">Tidak ada data</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script type="module" src="js/app.js"></script>
+    <!-- ══ PAGE: REKENING ══ -->
+    <div class="page" id="page-rekening">
+      <div class="section-card">
+        <div class="total-saldo-card">
+          <span class="ts-label" data-i18n="total_saldo">Total Saldo</span>
+          <span class="ts-value" id="totalSaldo">Rp 0</span>
+        </div>
+        <div class="rekening-list" id="rekeningList"></div>
+        <button class="btn-add-rekening" id="btnAddRekening">+ <span data-i18n="tambah_rekening">Tambah Rekening</span></button>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: REKAP ══ -->
+    <div class="page" id="page-rekap">
+      <!-- Realtime -->
+      <div class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Realtime</h2>
+          <span class="rekap-period" id="rekapPeriod"></span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="rekapChart"></canvas>
+          <p class="chart-empty" id="rekapChartEmpty">Belum ada data</p>
+        </div>
+        <div class="chart-legend" id="rekapLegend"></div>
+      </div>
+      <!-- Bulanan -->
+      <div class="section-card">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="bulanan">Bulanan</h2>
+          <div class="month-nav">
+            <button class="icon-btn sm" id="rekapPrevMonth">‹</button>
+            <span class="month-label" id="rekapMonthLabel"></span>
+            <button class="icon-btn sm" id="rekapNextMonth">›</button>
+          </div>
+        </div>
+        <div class="rekap-monthly-grid" id="rekapMonthlyGrid">
+          <div class="summary-empty">Tidak ada data bulan ini.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: SETTING ══ -->
+    <div class="page" id="page-setting">
+      <div class="section-card">
+        <h2 class="section-title" style="margin-bottom:16px">Setting</h2>
+
+        <div class="setting-group">
+          <div class="setting-item" id="settingTheme">
+            <span class="setting-icon">🎨</span>
+            <div class="setting-info">
+              <span class="setting-label" data-i18n="warna_tema">Warna Tema</span>
+              <span class="setting-desc" id="themeDesc">Mode Terang</span>
+            </div>
+            <div class="toggle-switch" id="themeToggleSetting"><div class="toggle-knob"></div></div>
+          </div>
+
+          <div class="setting-item" id="settingLang">
+            <span class="setting-icon">🌐</span>
+            <div class="setting-info">
+              <span class="setting-label">Bahasa / Language</span>
+              <span class="setting-desc" id="langDesc">Indonesia</span>
+            </div>
+            <div class="toggle-switch" id="langToggle"><div class="toggle-knob"></div></div>
+          </div>
+
+          <div class="setting-item" id="settingReminder">
+            <span class="setting-icon">🔔</span>
+            <div class="setting-info">
+              <span class="setting-label" data-i18n="pengingat">Pengingat</span>
+              <span class="setting-desc" data-i18n="pengingat_desc">Notifikasi harian</span>
+            </div>
+            <div class="toggle-switch" id="reminderToggle"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+
+        <div class="setting-group danger-group">
+          <button class="btn-setting-danger" id="btnDeleteAll">
+            🗑 <span data-i18n="hapus_semua">Hapus Semua Data</span>
+          </button>
+        </div>
+
+        <p class="setting-footer">Dibuat oleh <strong>Iswan Herdiansah</strong> · Visualisasi Anggaran © 2026</p>
+      </div>
+    </div>
+
+  </main><!-- end page-container -->
+</div><!-- end app-shell -->
+
+<!-- ════════════════════════════════════════════
+     BOTTOM SHEET: PILIH JENIS TRANSAKSI
+════════════════════════════════════════════ -->
+<div class="sheet-backdrop" id="sheetAddType">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title" data-i18n="tambah_transaksi">Tambah Transaksi</h3>
+    <div class="add-type-grid">
+      <button class="add-type-btn income" data-type="income">
+        <span class="atb-icon">📈</span>
+        <span data-i18n="pemasukan">Pemasukan</span>
+      </button>
+      <button class="add-type-btn expense" data-type="expense">
+        <span class="atb-icon">📉</span>
+        <span data-i18n="pengeluaran">Pengeluaran</span>
+      </button>
+      <button class="add-type-btn transfer" data-type="transfer">
+        <span class="atb-icon">🔄</span>
+        <span data-i18n="pindah_saldo">Pindah Saldo</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     BOTTOM SHEET: FORM TRANSAKSI
+════════════════════════════════════════════ -->
+<div class="sheet-backdrop" id="sheetTxForm">
+  <div class="sheet sheet-tall">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <button class="sheet-back" id="btnTxBack">‹</button>
+      <h3 class="sheet-title" id="txFormTitle">Tambah Pemasukan</h3>
+      <button class="sheet-close" id="btnTxClose">✕</button>
+    </div>
+
+    <div class="sheet-body" id="txFormBody">
+      <!-- Tanggal & Jam -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label data-i18n="tanggal">Tanggal</label>
+          <input type="date" id="txDate" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label data-i18n="jam">Jam</label>
+          <input type="time" id="txTime" class="form-input" />
+        </div>
+      </div>
+
+      <!-- Rekening -->
+      <div class="form-group" id="txRekeningWrap">
+        <label data-i18n="rekening">Rekening</label>
+        <select id="txRekening" class="form-input"></select>
+      </div>
+
+      <!-- Tujuan Rekening (transfer only) -->
+      <div class="form-group hidden" id="txTujuanWrap">
+        <label data-i18n="tujuan_rekening">Tujuan Rekening</label>
+        <select id="txTujuan" class="form-input"></select>
+      </div>
+
+      <!-- Jumlah + Kalkulator -->
+      <div class="form-group">
+        <label data-i18n="jumlah">Jumlah (Rp)</label>
+        <div class="amount-wrap">
+          <input type="text" id="txAmount" class="form-input amount-input" placeholder="0" inputmode="numeric" />
+          <button type="button" class="btn-calc" id="btnCalc">🧮</button>
+        </div>
+        <span class="field-error" id="txAmountError"></span>
+      </div>
+
+      <!-- Kalkulator inline -->
+      <div class="calculator hidden" id="calcPanel">
+        <div class="calc-display" id="calcDisplay">0</div>
+        <div class="calc-grid">
+          <button class="calc-btn" data-val="7">7</button><button class="calc-btn" data-val="8">8</button><button class="calc-btn" data-val="9">9</button><button class="calc-btn op" data-val="/">÷</button>
+          <button class="calc-btn" data-val="4">4</button><button class="calc-btn" data-val="5">5</button><button class="calc-btn" data-val="6">6</button><button class="calc-btn op" data-val="*">×</button>
+          <button class="calc-btn" data-val="1">1</button><button class="calc-btn" data-val="2">2</button><button class="calc-btn" data-val="3">3</button><button class="calc-btn op" data-val="-">−</button>
+          <button class="calc-btn" data-val="0">0</button><button class="calc-btn" data-val=".">.</button><button class="calc-btn op" id="calcClear">C</button><button class="calc-btn op" data-val="+">+</button>
+          <button class="calc-btn span2" id="calcBackspace">⌫</button><button class="calc-btn ok span2" id="calcOk">=</button>
+        </div>
+      </div>
+
+      <!-- Judul (income/expense only) -->
+      <div class="form-group" id="txJudulWrap">
+        <label data-i18n="judul">Judul</label>
+        <div class="input-mic-wrap">
+          <select id="txJudul" class="form-input">
+            <option value="">— Pilih judul —</option>
+            <option value="Gaji Bulanan">Gaji Bulanan</option>
+            <option value="Jualan">Jualan</option>
+            <option value="Tabungan">Tabungan</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+          <button type="button" class="btn-mic" data-target="txJudul" title="Voice input">🎤</button>
+        </div>
+      </div>
+
+      <!-- Kategori (income/expense only) -->
+      <div class="form-group" id="txKategoriWrap">
+        <label data-i18n="kategori">Kategori</label>
+        <div class="input-mic-wrap">
+          <select id="txKategori" class="form-input">
+            <option value="">— Pilih kategori —</option>
+            <option value="Gaji Bulanan">Gaji Bulanan</option>
+            <option value="Freelance">Freelance</option>
+            <option value="Sampingan">Sampingan</option>
+            <option value="Jualan">Jualan</option>
+            <option value="Makanan">Makanan</option>
+            <option value="Transportasi">Transportasi</option>
+            <option value="Hiburan">Hiburan</option>
+            <option value="Kesehatan">Kesehatan</option>
+            <option value="Belanja">Belanja</option>
+            <option value="Tagihan">Tagihan</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+          <button type="button" class="btn-mic" data-target="txKategori" title="Voice input">🎤</button>
+        </div>
+      </div>
+
+      <!-- Keterangan -->
+      <div class="form-group">
+        <label data-i18n="keterangan">Keterangan <span class="label-opt">(opsional)</span></label>
+        <div class="input-mic-wrap">
+          <input type="text" id="txKeterangan" class="form-input" placeholder="Tambahkan catatan…" />
+          <button type="button" class="btn-mic" data-target="txKeterangan" title="Voice input">🎤</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-footer">
+      <button class="btn-delete-tx hidden" id="btnDeleteTx">🗑</button>
+      <button class="btn-save-tx" id="btnSaveTx" data-i18n="simpan">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     BOTTOM SHEET: EDIT / TAMBAH REKENING
+════════════════════════════════════════════ -->
+<div class="sheet-backdrop" id="sheetRekening">
+  <div class="sheet sheet-tall">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <button class="sheet-back" id="btnRekBack">‹</button>
+      <h3 class="sheet-title" id="rekeningFormTitle">Edit Rekening</h3>
+      <button class="sheet-close" id="btnRekClose">✕</button>
+    </div>
+    <div class="sheet-body">
+      <!-- Riwayat rekening -->
+      <div class="rek-history" id="rekHistory">
+        <h4 class="rek-history-title" data-i18n="riwayat">Riwayat</h4>
+        <div class="tx-list sm" id="rekHistoryList">
+          <div class="empty-state sm"><p>Belum ada transaksi</p></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label data-i18n="nama_rekening">Nama Rekening</label>
+        <input type="text" id="rekNama" class="form-input" placeholder="cth. BCA, Dana…" />
+        <span class="field-error" id="rekNamaError"></span>
+      </div>
+      <div class="form-group">
+        <label data-i18n="saldo_awal">Saldo (Rp)</label>
+        <div class="amount-wrap">
+          <input type="text" id="rekSaldo" class="form-input amount-input" placeholder="0" inputmode="numeric" />
+          <button type="button" class="btn-calc" id="btnRekCalc">🧮</button>
+        </div>
+      </div>
+      <div class="calculator hidden" id="calcPanelRek">
+        <div class="calc-display" id="calcDisplayRek">0</div>
+        <div class="calc-grid">
+          <button class="calc-btn" data-val="7">7</button><button class="calc-btn" data-val="8">8</button><button class="calc-btn" data-val="9">9</button><button class="calc-btn op" data-val="/">÷</button>
+          <button class="calc-btn" data-val="4">4</button><button class="calc-btn" data-val="5">5</button><button class="calc-btn" data-val="6">6</button><button class="calc-btn op" data-val="*">×</button>
+          <button class="calc-btn" data-val="1">1</button><button class="calc-btn" data-val="2">2</button><button class="calc-btn" data-val="3">3</button><button class="calc-btn op" data-val="-">−</button>
+          <button class="calc-btn" data-val="0">0</button><button class="calc-btn" data-val=".">.</button><button class="calc-btn op" id="calcClearRek">C</button><button class="calc-btn op" data-val="+">+</button>
+          <button class="calc-btn span2" id="calcBackspaceRek">⌫</button><button class="calc-btn ok span2" id="calcOkRek">=</button>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn-delete-tx" id="btnDeleteRek">🗑</button>
+      <button class="btn-save-tx" id="btnSaveRek" data-i18n="simpan">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="confirm-backdrop hidden" id="confirmDialog">
+  <div class="confirm-box">
+    <p class="confirm-msg" id="confirmMsg">Apakah Anda yakin?</p>
+    <div class="confirm-actions">
+      <button class="btn-secondary" id="confirmCancel" data-i18n="batal">Batal</button>
+      <button class="btn-danger" id="confirmOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
