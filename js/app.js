@@ -89,8 +89,9 @@ let transactions   = [];
 let rekening       = {};
 let dbListeners    = [];
 let rekapChart     = null;
-let rekapViewYear  = new Date().getFullYear();
-let rekapViewMonth = new Date().getMonth();
+let rekapViewYear   = new Date().getFullYear();
+let rekapViewMonth  = new Date().getMonth();
+let rekapChartType  = 'expense'; // 'expense' | 'income' | 'transfer'
 let editTxId       = null;
 let editRekId      = null;
 let currentTxType  = 'expense';
@@ -458,13 +459,19 @@ function renderRekapChart() {
   const legend = document.getElementById('rekapLegend');
 
   const totals = {};
-  transactions.filter(tx => tx.type === 'expense').forEach(tx => {
-    const k = (tx.kategori && tx.kategori.trim()) ? tx.kategori
-            : (tx.judul && tx.judul.trim() ? tx.judul : 'Lainnya');
+  transactions.filter(tx => tx.type === rekapChartType).forEach(tx => {
+    let k;
+    if (rekapChartType === 'transfer') {
+      k = (tx.rekening && tx.rekening.trim()) ? `${tx.rekening} → ${tx.tujuan || '?'}` : 'Lainnya';
+    } else {
+      k = (tx.kategori && tx.kategori.trim()) ? tx.kategori
+        : (tx.judul && tx.judul.trim() ? tx.judul : 'Lainnya');
+    }
     totals[k] = (totals[k] || 0) + tx.amount;
   });
   const cats = Object.keys(totals);
   empty.classList.toggle('hidden', cats.length > 0);
+  if (cats.length === 0) empty.classList.remove('hidden');
 
   const COLORS = ['#4f6ef7','#10b981','#f59e0b','#ef4444','#a855f7','#3b82f6','#f97316','#06b6d4','#84cc16','#ec4899'];
   const colors = cats.map((_, i) => COLORS[i % COLORS.length]);
@@ -639,6 +646,17 @@ function initSheetButtons() {
       await dbDel(`rekening/${editRekId}`);
       closeSheet('sheetRekening');
       toast('Rekening dihapus', 'info');
+    });
+  });
+
+  // Chart type tabs
+  document.querySelectorAll('.chart-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      rekapChartType = btn.dataset.chartType;
+      if (rekapChart) { rekapChart.destroy(); rekapChart = null; }
+      renderRekapChart();
     });
   });
 

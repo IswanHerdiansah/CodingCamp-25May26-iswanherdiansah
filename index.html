@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dompet — Visualisasi Anggaran</title>
+  <title>Dompet Visualisasi Anggaran</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -59,7 +59,7 @@
     <div class="auth-panel hidden" id="panelRegister">
       <form id="registerForm" novalidate>
         <div class="form-group">
-          <label>Nama Tampilan</label>
+          <label>Nama Lengkap</label>
           <input type="text" id="regDisplayName" placeholder="Nama yang ditampilkan" maxlength="32" autocomplete="off" />
           <span class="field-error" id="regDisplayNameError"></span>
         </div>
@@ -222,6 +222,11 @@
           <h2 class="section-title">Realtime</h2>
           <span class="rekap-period" id="rekapPeriod"></span>
         </div>
+        <div class="chart-type-tabs">
+          <button class="chart-tab active" data-chart-type="expense">📉 Pengeluaran</button>
+          <button class="chart-tab" data-chart-type="income">📈 Pemasukan</button>
+          <button class="chart-tab" data-chart-type="transfer">🔄 Pindah Saldo</button>
+        </div>
         <div class="chart-wrap">
           <canvas id="rekapChart"></canvas>
           <p class="chart-empty" id="rekapChartEmpty">Belum ada data</p>
@@ -378,37 +383,39 @@
       <div class="form-group" id="txJudulWrap">
         <label data-i18n="judul">Judul</label>
         <div class="input-mic-wrap">
-          <select id="txJudul" class="form-input">
-            <option value="">— Pilih judul —</option>
-            <option value="Gaji Bulanan">Gaji Bulanan</option>
-            <option value="Jualan">Jualan</option>
-            <option value="Tabungan">Tabungan</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
+          <input type="text" id="txJudul" class="form-input" placeholder="Ketik atau pilih judul…" list="judulList" autocomplete="off" />
           <button type="button" class="btn-mic" data-target="txJudul" title="Voice input">🎤</button>
         </div>
+        <datalist id="judulList">
+          <option value="Gaji Bulanan">
+          <option value="Jualan">
+          <option value="Tabungan">
+          <option value="Bonus">
+          <option value="Investasi">
+          <option value="Lainnya">
+        </datalist>
       </div>
 
       <!-- Kategori (income/expense only) -->
       <div class="form-group" id="txKategoriWrap">
         <label data-i18n="kategori">Kategori</label>
         <div class="input-mic-wrap">
-          <select id="txKategori" class="form-input">
-            <option value="">— Pilih kategori —</option>
-            <option value="Gaji Bulanan">Gaji Bulanan</option>
-            <option value="Freelance">Freelance</option>
-            <option value="Sampingan">Sampingan</option>
-            <option value="Jualan">Jualan</option>
-            <option value="Makanan">Makanan</option>
-            <option value="Transportasi">Transportasi</option>
-            <option value="Hiburan">Hiburan</option>
-            <option value="Kesehatan">Kesehatan</option>
-            <option value="Belanja">Belanja</option>
-            <option value="Tagihan">Tagihan</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
+          <input type="text" id="txKategori" class="form-input" placeholder="Ketik atau pilih kategori…" list="kategoriList" autocomplete="off" />
           <button type="button" class="btn-mic" data-target="txKategori" title="Voice input">🎤</button>
         </div>
+        <datalist id="kategoriList">
+          <option value="Gaji Bulanan">
+          <option value="Freelance">
+          <option value="Sampingan">
+          <option value="Jualan">
+          <option value="Makanan">
+          <option value="Transportasi">
+          <option value="Hiburan">
+          <option value="Kesehatan">
+          <option value="Belanja">
+          <option value="Tagihan">
+          <option value="Lainnya">
+        </datalist>
       </div>
 
       <!-- Keterangan -->
