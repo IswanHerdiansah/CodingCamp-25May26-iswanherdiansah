@@ -109,10 +109,12 @@
         <span class="logo-text">Visualisasi Anggaran</span>
       </div>
       <div class="topbar-right">
-        <div class="user-chip">
+        <div class="user-chip" id="userChip" title="Ubah foto profil" style="cursor:pointer">
           <span class="user-avatar" id="userAvatar">?</span>
           <span class="user-name" id="userNameDisplay"></span>
         </div>
+        <!-- Hidden file input for profile photo -->
+        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" />
         <button class="icon-btn" id="themeToggle" title="Ganti tema"><span id="themeIcon">🌙</span></button>
         <button class="icon-btn danger" id="btnLogout" title="Keluar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
